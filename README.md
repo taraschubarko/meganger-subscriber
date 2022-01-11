@@ -8,6 +8,8 @@
 
 ```bash
 npm install --save mesenger_subscriber
+or
+yarn add mesenger_subscriber
 ```
 
 ## Usage
