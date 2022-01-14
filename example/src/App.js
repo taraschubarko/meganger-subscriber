@@ -1,18 +1,76 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react';
 
-import { MesengerBot } from 'mesenger_subscriber'
+import MesengerBot from 'mesenger_subscriber'
 import 'mesenger_subscriber/dist/index.css'
+import axios from "axios";
 
 const App = () => {
   const host = 'https://localhost';
-  //const host = 'https://nachai-api.progim.net';
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODA4NVwvYXBpXC92MFwvYXV0aFwvbG9naW4iLCJpYXQiOjE2NDE5MTEyOTgsImV4cCI6MTY0MzEyMDg5OCwibmJmIjoxNjQxOTExMjk4LCJqdGkiOiJoZXV1VWhUTHZCWU5VSEFLIiwic3ViIjoiYjJjZDZkY2ItNzNjMS00MWYxLWIyNDQtN2M5MWFlOTFiY2NlIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.EiAqY8zjNdHfP3LnjhLweXEzcd1djqPjdjJhdBJ2328';
-  //const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbmFjaGFpLWFwaS5wcm9naW0ubmV0XC9hcGlcL3YwXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0MTkwNDY3OSwiZXhwIjoxNjQzMTE0Mjc5LCJuYmYiOjE2NDE5MDQ2NzksImp0aSI6ImtiekpramNZT2IwTndNQ3giLCJzdWIiOjIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.TQJMMjTEx2GgkAKoN1x8m10sYyGHe8KVLVNObPVTOmQ';
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbG9jYWxob3N0XC9hcGlcL3YwXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0MjE2MTU1MiwiZXhwIjoxNjQzMzcxMTUyLCJuYmYiOjE2NDIxNjE1NTIsImp0aSI6IlNweFBvOHVGU29rdHc0RXQiLCJzdWIiOiIwMWI2MDU1MS1hZTY0LTRmMTItOWI5MC1iOTM5ZTU3OWRhZWMiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.mzZ7wHtTctylJ8rBI0M6--j7pzO-YBWL5Mn-aiv9DVo';
+
+  const [item, setItem] = useState({});
+  const [telegramText, setTelegramText] = useState('Привязать');
+  const [whatsappText, setWhatsappText] = useState('Привязать');
+  const [telegramAction, setTelegramAction] = useState('subscribe');
+  const [whatsappAction, setWhatsappAction] = useState('subscribe');
+
+  const subs = (result) => {
+    setItem(result.data);
+  };
+
+  const mySubscr = () => {
+    axios.get(`${host}/api/v0/settings/subscribe`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(response => {
+      setItem(response.data.data);
+    });
+  };
+
+  const setText = () => {
+    if (Object.keys(item).length) {
+      if (item.subscribers.telegram.is_subscribed) {
+        setTelegramText('Отвязать');
+        setTelegramAction('unsubscribe');
+      }
+      if (item.subscribers.whatsapp.is_subscribed) {
+        setWhatsappText('Отвязать');
+        setWhatsappAction('unsubscribe');
+      }
+    }
+  }
+
+  useEffect(() => mySubscr(), []);
+  useEffect(() => {
+    setText()
+  });
+
   return <div>
     <p>Подписка на telegram</p>
-    <MesengerBot type="telegram" className="btn" label={'Привязать'} host={host} token={token} />
+    <MesengerBot
+      provider="telegram"
+      className="btn"
+      label={telegramText}
+      host={host}
+      token={token}
+      onSubscribe={subs}
+      onUnSubscribe={subs}
+      item={item}
+      action={telegramAction}
+    />
     <p>Подписка на whatsapp</p>
-    <MesengerBot type="whatsapp" className="btn" label={'Привязать'} host={host} token={token} />
+    <MesengerBot
+      provider="whatsapp"
+      className="btn"
+      label={whatsappText}
+      host={host}
+      token={token}
+      onSubscribe={subs}
+      onUnSubscribe={subs}
+      item={item}
+      action={whatsappAction}
+    />
   </div>
 }
 
