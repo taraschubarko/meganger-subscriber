@@ -30,14 +30,22 @@ const App = () => {
 
   const setText = () => {
     if (Object.keys(item).length) {
-      if (item.subscribers.telegram.is_subscribed) {
-        setTelegramText('Отвязать');
-        setTelegramAction('unsubscribe');
-      }
-      if (item.subscribers.whatsapp.is_subscribed) {
-        setWhatsappText('Отвязать');
-        setWhatsappAction('unsubscribe');
-      }
+      item.providers.map(val => {
+        switch (val.provider) {
+          case 'whatsapp':
+            if(val.is_subscribe){
+              setWhatsappText('Отвязать');
+              setWhatsappAction('unsubscribe');
+            }
+            break;
+          case 'telegram':
+            if(val.is_subscribe){
+              setTelegramText('Отвязать');
+              setTelegramAction('unsubscribe');
+            }
+            break;
+        }
+      })
     }
   }
 

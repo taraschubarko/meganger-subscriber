@@ -48,15 +48,14 @@ class MesengerBot extends React.Component {
   }
 
   onUnSubscribe(){
-    this.props.item.subscribers[this.props.provider].is_subscribed = false;
-    this.props.item.subscribers[this.props.provider].payload.nachai = false;
-    this.props.item.subscribers[this.props.provider].payload.review = false;
-    this.props.item.subscribers[this.props.provider].payload.worckday = false;
-    //
-    axios.post(`${this.props.host}/api/v0/settings/subscribe`, {
-      type: this.props.item.type,
-      time: this.props.item.time,
-      payload: JSON.stringify(this.props.item.subscribers)
+    let data = {};
+    this.props.item.providers.map(val => {
+      if(val.provider === this.props.provider){
+        data = val;
+      }
+    })
+    axios.post(`${this.props.host}/api/v0/settings/subscribe/provider/${data.id}/update`, {
+      is_subscribe: false,
     }, {
       headers: {
         Authorization: `Bearer ${this.props.token}`
